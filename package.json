@@ -3,22 +3,22 @@
     "build": "rollup -c --environment BUILD:production"
   },
   "devDependencies": {
-    "@types/request-promise": "^4.1.39",
-    "rollup": "^0.53.2",
-    "rollup-plugin-commonjs": "^8.2.6",
-    "rollup-plugin-istanbul": "^2.0.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-typescript2": "^0.9.0",
-    "typescript": "^2.6.2"
+    "@types/request-promise": "^4.1.48",
+    "rollup": "^2.79.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-istanbul": "^3.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "typescript": "^4.8.4"
   },
   "dependencies": {
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2",
-    "url-join": "^2.0.2"
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "url-join": "^5.0.0"
   },
   "name": "wda-driver",
   "description": "Facebook WebDriverAgent Node Client Library (not official)",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/wda.js",
   "directories": {
     "test": "test"

@@ -4,4 +4,4 @@ const wda = {
   Client
 }
 
-export default wda
+module.exports = wda

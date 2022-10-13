@@ -1,6 +1,6 @@
 import httpdo from '../util/httpdo'
 
-const urljoin = require('url-join')
+import urljoin from 'url-join'
 
 class HTTPClient {
   address: string

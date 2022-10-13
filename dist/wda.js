@@ -1,43 +1,34 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+var rp = require('request-promise');
+var fs = require('fs');
 
-var rp = _interopDefault(require('request-promise'));
-var fs = _interopDefault(require('fs'));
+function _interopDefaultLegacy(e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
+var rp__default = /*#__PURE__*/_interopDefaultLegacy(rp);
+var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
 
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
-
-
-
-
-
-
-
-
-
-
-
-
 
 function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 }
@@ -66,12 +57,12 @@ function httpdo(url, method = 'GET', payload) {
         // console.log(`Shell: curl -X ${method} -d '${payload}' '${url}'`)
         let res;
         try {
-            res = yield rp(options);
+            res = yield rp__default["default"](options);
         }
         catch (e) {
             // console.log(`retry to connect, error: ${e}`)
             yield sleep(1000);
-            res = yield rp(options);
+            res = yield rp__default["default"](options);
         }
         const retjson = res;
         // console.log(`Return {{${new Date().getTime() - startTime}ms}}`, retjson)
@@ -79,14 +70,84 @@ function httpdo(url, method = 'GET', payload) {
     });
 }
 
-const urljoin = require('url-join');
+function normalize(strArray) {
+    var resultArray = [];
+    if (strArray.length === 0) { return ''; }
+
+    if (typeof strArray[0] !== 'string') {
+        throw new TypeError('Url must be a string. Received ' + strArray[0]);
+    }
+
+    // If the first part is a plain protocol, we combine it with the next part.
+    if (strArray[0].match(/^[^/:]+:\/*$/) && strArray.length > 1) {
+        var first = strArray.shift();
+        strArray[0] = first + strArray[0];
+    }
+
+    // There must be two or three slashes in the file protocol, two slashes in anything else.
+    if (strArray[0].match(/^file:\/\/\//)) {
+        strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1:///');
+    } else {
+        strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1://');
+    }
+
+    for (var i = 0; i < strArray.length; i++) {
+        var component = strArray[i];
+
+        if (typeof component !== 'string') {
+            throw new TypeError('Url must be a string. Received ' + component);
+        }
+
+        if (component === '') { continue; }
+
+        if (i > 0) {
+            // Removing the starting slashes for each component but the first.
+            component = component.replace(/^[\/]+/, '');
+        }
+        if (i < strArray.length - 1) {
+            // Removing the ending slashes for each component but the last.
+            component = component.replace(/[\/]+$/, '');
+        } else {
+            // For the last component we will combine multiple slashes to a single one.
+            component = component.replace(/[\/]+$/, '/');
+        }
+
+        resultArray.push(component);
+
+    }
+
+    var str = resultArray.join('/');
+    // Each input component is now separated by a single slash except the possible first plain protocol part.
+
+    // remove trailing slash before parameters or hash
+    str = str.replace(/\/(\?|&|#[^!])/g, '$1');
+
+    // replace ? in parameters with &
+    var parts = str.split('?');
+    str = parts.shift() + (parts.length > 0 ? '?' : '') + parts.join('&');
+
+    return str;
+}
+
+function urlJoin() {
+    var input;
+
+    if (typeof arguments[0] === 'object') {
+        input = arguments[0];
+    } else {
+        input = [].slice.call(arguments);
+    }
+
+    return normalize(input);
+}
+
 class HTTPClient {
     constructor(address, alertCallback) {
         this.address = address;
         this.alertCallback = alertCallback;
     }
     newClient(path) {
-        return new HTTPClient(urljoin(this.address, path), this.alertCallback);
+        return new HTTPClient(urlJoin(this.address, path), this.alertCallback);
     }
     fetch(method, url, data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -95,7 +156,7 @@ class HTTPClient {
     }
     fetchNoAlert(method, queryUrl, data, depth) {
         return __awaiter(this, void 0, void 0, function* () {
-            const targetUrl = urljoin(this.address, queryUrl);
+            const targetUrl = urlJoin(this.address, queryUrl);
             try {
                 return yield httpdo(targetUrl, method, data);
             }
@@ -873,7 +934,7 @@ class Client {
             // }
             // To create a new session, send json data like
             // {
-            //     "desiredCapabilities": {
+            //     "capabilities": {
             //         "bundleId": "your-bundle-id",
             //         "app": "your-app-path"
             //         "shouldUseCompactResponses": (bool),
@@ -906,7 +967,7 @@ class Client {
                 shouldWaitForQuiescence: true,
             };
             const data = {
-                desiredCapabilities: capabilities
+                capabilities: capabilities
             };
             const res = yield this.http.fetch('post', 'session', data);
             const httpclient = this.http.newClient('session/' + res.sessionId);
@@ -923,7 +984,7 @@ class Client {
     screenshot(pngFilename = 'screenshot.png') {
         return __awaiter(this, void 0, void 0, function* () {
             const { value } = yield this.http.fetch('get', 'screenshot');
-            fs.writeFileSync(pngFilename, value, 'base64');
+            fs__default["default"].writeFileSync(pngFilename, value, 'base64');
             return value;
         });
     }
@@ -932,6 +993,5 @@ class Client {
 const wda = {
     Client
 };
-
 module.exports = wda;
 //# sourceMappingURL=wda.js.map

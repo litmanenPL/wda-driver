@@ -70,7 +70,7 @@ class Client {
             // }
             // To create a new session, send json data like
             // {
-            //     "desiredCapabilities": {
+            //     "capabilities": {
             //         "bundleId": "your-bundle-id",
             //         "app": "your-app-path"
             //         "shouldUseCompactResponses": (bool),
@@ -103,7 +103,7 @@ class Client {
                 shouldWaitForQuiescence: true,
             };
             const data = {
-                desiredCapabilities: capabilities
+                capabilities: capabilities
             };
             const res = yield this.http.fetch('post', 'session', data);
             const httpclient = this.http.newClient('session/' + res.sessionId);

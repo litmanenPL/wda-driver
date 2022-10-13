@@ -12,9 +12,9 @@ let plugins = [
 export default {
   plugins: plugins,
   input: 'src/main.ts',
-	external: [ 'path', 'fs', 'url', 'request-promise' ],
-  moduleName: 'wda',
+	external: [ 'path', 'fs', 'url', 'request-promise' ],  
   output: {
+    name: 'wda',
     file: 'dist/wda.js',
     format: 'cjs',
     sourcemap: true
