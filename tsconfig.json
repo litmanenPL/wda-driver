@@ -2,7 +2,10 @@
 	"compilerOptions": {
 		"module": "es6",
 		"target": "es6",
-    "lib": ["es2017", "dom"],
+		"lib": [
+			"es2017",
+			"dom"
+		],
 		"noImplicitAny": true,
 		"sourceMap": true,
 		"noUnusedParameters": true,
@@ -15,12 +18,12 @@
 		"noEmitOnError": false,
 		"strictNullChecks": true,
 		"forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
+		"allowSyntheticDefaultImports": true,
 		"noImplicitReturns": true,
 		"outDir": "./dist",
-    "typeRoots": [
-      "node_modules/@types"
-    ]
+		"typeRoots": [
+			"node_modules/@types"
+		]
 	},
 	"include": [
 		"src/**/*.ts"

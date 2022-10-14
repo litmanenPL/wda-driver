@@ -9,27 +9,27 @@ class Client {
   // target (string): the device url
 
   // If target is None, set to "http://localhost:8100"
-  constructor (url: string = 'http://localhost:8100') {
+  constructor(url: string = 'http://localhost:8100') {
     this.http = new HTTPClient(url)
   }
 
-  async status () {
+  async status() {
     const res = await this.http.fetch('get', 'status')
 
     return res
   }
 
-  async home () {
+  async home() {
     // Press home button
     return await this.http.fetch('post', '/wda/homescreen')
   }
 
-  async healthcheck () {
+  async healthcheck() {
     // Hit healthcheck
     return await this.http.fetch('get', '/wda/healthcheck')
   }
 
-  async source (format: 'xml' | 'json' = 'xml', accessible: boolean = false) {
+  async source(format: 'xml' | 'json' = 'xml', accessible: boolean = false) {
     // Args:
     //   format (str): only 'xml' and 'json' source types are supported
     //   accessible (bool): when set to true, format is always 'json'
@@ -42,7 +42,7 @@ class Client {
     return res.value
   }
 
-  async session (bundleId?: string, args: string[] = [], environment: any = {}) {
+  async session(bundleId?: string, args: string[] = [], environment: any = {}) {
     // Args:
     //     - bundle_id (str): the app bundle id
     //     - arguments (list): ['-u', 'https://www.google.com/ncr']
@@ -107,7 +107,7 @@ class Client {
 
     const res = await this.http.fetch('post', 'session', data)
     const httpclient = this.http.newClient('session/' + res.sessionId)
-    const value = await httpclient.fetch('get', '/')
+    const { value } = await httpclient.fetch('get', '/')
     return new Session(httpclient, value)
   }
 
@@ -117,7 +117,7 @@ class Client {
    * @param pngFilename optional, save file name
    * @return png raw data
    */
-  async screenshot (pngFilename: string = 'screenshot.png') {
+  async screenshot(pngFilename: string = 'screenshot.png') {
     const { value } = await this.http.fetch('get', 'screenshot')
     fs.writeFileSync(pngFilename, value, 'base64')
     return value

@@ -1,11 +1,11 @@
 'use strict';
 
-var rp = require('request-promise');
+var axios = require('axios');
 var fs = require('fs');
 
-function _interopDefaultLegacy(e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var rp__default = /*#__PURE__*/_interopDefaultLegacy(rp);
+var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 
 /******************************************************************************
@@ -45,109 +45,39 @@ function httpdo(url, method = 'GET', payload) {
     return __awaiter(this, void 0, void 0, function* () {
         // const startTime = new Date().getTime()
         const options = {
-            uri: url,
+            url,
             method,
-            body: payload,
-            headers: {
-                'User-Agent': 'Request-Promise'
-            },
-            json: true // Automatically parses the JSON string in the response
+            data: payload
         };
         // Do HTTP Request
         // console.log(`Shell: curl -X ${method} -d '${payload}' '${url}'`)
         let res;
         try {
-            res = yield rp__default["default"](options);
+            res = yield axios__default["default"](options);
         }
         catch (e) {
             // console.log(`retry to connect, error: ${e}`)
             yield sleep(1000);
-            res = yield rp__default["default"](options);
+            res = yield axios__default["default"](options);
         }
-        const retjson = res;
+        const retjson = res.data;
         // console.log(`Return {{${new Date().getTime() - startTime}ms}}`, retjson)
         return retjson;
     });
 }
 
-function normalize(strArray) {
-    var resultArray = [];
-    if (strArray.length === 0) { return ''; }
-
-    if (typeof strArray[0] !== 'string') {
-        throw new TypeError('Url must be a string. Received ' + strArray[0]);
-    }
-
-    // If the first part is a plain protocol, we combine it with the next part.
-    if (strArray[0].match(/^[^/:]+:\/*$/) && strArray.length > 1) {
-        var first = strArray.shift();
-        strArray[0] = first + strArray[0];
-    }
-
-    // There must be two or three slashes in the file protocol, two slashes in anything else.
-    if (strArray[0].match(/^file:\/\/\//)) {
-        strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1:///');
-    } else {
-        strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1://');
-    }
-
-    for (var i = 0; i < strArray.length; i++) {
-        var component = strArray[i];
-
-        if (typeof component !== 'string') {
-            throw new TypeError('Url must be a string. Received ' + component);
-        }
-
-        if (component === '') { continue; }
-
-        if (i > 0) {
-            // Removing the starting slashes for each component but the first.
-            component = component.replace(/^[\/]+/, '');
-        }
-        if (i < strArray.length - 1) {
-            // Removing the ending slashes for each component but the last.
-            component = component.replace(/[\/]+$/, '');
-        } else {
-            // For the last component we will combine multiple slashes to a single one.
-            component = component.replace(/[\/]+$/, '/');
-        }
-
-        resultArray.push(component);
-
-    }
-
-    var str = resultArray.join('/');
-    // Each input component is now separated by a single slash except the possible first plain protocol part.
-
-    // remove trailing slash before parameters or hash
-    str = str.replace(/\/(\?|&|#[^!])/g, '$1');
-
-    // replace ? in parameters with &
-    var parts = str.split('?');
-    str = parts.shift() + (parts.length > 0 ? '?' : '') + parts.join('&');
-
-    return str;
+function combineURLs(baseURL, relativeURL) {
+    return relativeURL
+        ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+        : baseURL;
 }
-
-function urlJoin() {
-    var input;
-
-    if (typeof arguments[0] === 'object') {
-        input = arguments[0];
-    } else {
-        input = [].slice.call(arguments);
-    }
-
-    return normalize(input);
-}
-
 class HTTPClient {
     constructor(address, alertCallback) {
         this.address = address;
         this.alertCallback = alertCallback;
     }
     newClient(path) {
-        return new HTTPClient(urlJoin(this.address, path), this.alertCallback);
+        return new HTTPClient(combineURLs(this.address, path), this.alertCallback);
     }
     fetch(method, url, data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -156,7 +86,7 @@ class HTTPClient {
     }
     fetchNoAlert(method, queryUrl, data, depth) {
         return __awaiter(this, void 0, void 0, function* () {
-            const targetUrl = urlJoin(this.address, queryUrl);
+            const targetUrl = combineURLs(this.address, queryUrl);
             try {
                 return yield httpdo(targetUrl, method, data);
             }
@@ -971,7 +901,7 @@ class Client {
             };
             const res = yield this.http.fetch('post', 'session', data);
             const httpclient = this.http.newClient('session/' + res.sessionId);
-            const value = yield httpclient.fetch('get', '/');
+            const { value } = yield httpclient.fetch('get', '/');
             return new Session(httpclient, value);
         });
     }

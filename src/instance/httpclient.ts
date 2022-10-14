@@ -1,26 +1,30 @@
 import httpdo from '../util/httpdo'
 
-import urljoin from 'url-join'
+function combineURLs(baseURL: string, relativeURL: string) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+}
 
 class HTTPClient {
   address: string
   alertCallback: Function | undefined
 
-  constructor (address: string, alertCallback?: Function) {
+  constructor(address: string, alertCallback?: Function) {
     this.address = address
     this.alertCallback = alertCallback
   }
 
-  newClient (path: string) {
-    return new HTTPClient(urljoin(this.address, path), this.alertCallback)
+  newClient(path: string) {
+    return new HTTPClient(combineURLs(this.address, path), this.alertCallback)
   }
 
-  async fetch (method: string, url: string, data?: any) {
+  async fetch(method: string, url: string, data?: any) {
     return await this.fetchNoAlert(method, url, data)
   }
 
-  protected async fetchNoAlert (method: string, queryUrl: string, data?: any, depth?: number): Promise<any> {
-    const targetUrl = urljoin(this.address, queryUrl)
+  protected async fetchNoAlert(method: string, queryUrl: string, data?: any, depth?: number): Promise<any> {
+    const targetUrl = combineURLs(this.address, queryUrl)
 
     try {
       return await httpdo(targetUrl, method, data)

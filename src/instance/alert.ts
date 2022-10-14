@@ -5,13 +5,13 @@ import sleep from '../util/sleep'
 class Alert {
   s: Session
   http: HTTPClient
-  
-  constructor (session: Session) {
+
+  constructor(session: Session) {
     this.s = session
     this.http = session.http
   }
 
-  async exists () {
+  async exists() {
     let text: string
     try {
       text = await this.text()
@@ -21,31 +21,31 @@ class Alert {
     return !!text
   }
 
-  async text () {
+  async text() {
     const { value } = await this.http.fetch('get', '/alert/text')
     return typeof value === 'string' ? value : ''
   }
 
-  async wait (timeout: number = 20) {
+  async wait(timeout: number = 20) {
     const startTime = new Date().getTime()
     while (new Date().getTime() - startTime < (timeout * 1000)) {
-      if ( await this.exists() ) {
+      if (await this.exists()) {
         return true
       }
       await sleep(20)
-    } 
+    }
     return false
   }
 
-  accept () {
+  accept() {
     return this.http.fetch('post', '/alert/accept')
   }
 
-  dismiss () {
+  dismiss() {
     return this.http.fetch('post', '/alert/dismiss')
   }
 
-  async buttons () {
+  async buttons() {
     const { value } = await this.http.fetch('get', '/wda/alert/buttons')
 
     return value
@@ -54,7 +54,7 @@ class Alert {
   /**
    * @param name the name of the button
    */
-  click (name: string) {
+  click(name: string) {
     return this.http.fetch('post', '/alert/accept', { name })
   }
 }

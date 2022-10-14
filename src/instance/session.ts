@@ -12,7 +12,7 @@ class Session {
    * @param httpclient HTTPClient
    * @param value get status object
    */
-  constructor (httpclient: HTTPClient, value: any) {
+  constructor(httpclient: HTTPClient, value: any) {
     this.http = httpclient
 
     // Example session value
@@ -26,19 +26,19 @@ class Session {
     this.sid = value.sessionId
   }
 
-  protected getId () {
+  protected getId() {
     return this.sid
   }
 
   // the session matched bundle id
-  protected getBundleId () {
+  protected getBundleId() {
     return this.capabilities.CFBundleIdentifier
   }
-  
+
   /**
    * @param callback called when alert popup
    */
-  setAlertCallback (callback: Function) {
+  setAlertCallback(callback: Function) {
     this.alertCallback = callback
   }
 
@@ -48,22 +48,22 @@ class Session {
    * 
    * @param url string
    */
-  async openUrl (url: string) {
-    return await this.http.fetch('post', 'url', {'url': url})
+  async openUrl(url: string) {
+    return await this.http.fetch('post', 'url', { 'url': url })
   }
 
   /**
    * @param duration deactivate time, seconds
    */
-  deactivate (duration: number) {
+  deactivate(duration: number) {
     return this.http.fetch('post', '/wda/deactivateApp', { duration })
   }
 
-  tap (x: number, y: number) {
+  tap(x: number, y: number) {
     return this.http.fetch('post', '/wda/tap/0', { x, y })
   }
 
-  doubleTap (x: number, y: number) {
+  doubleTap(x: number, y: number) {
     return this.http.fetch('post', '/wda/doubleTap', { x, y })
   }
 
@@ -75,7 +75,7 @@ class Session {
    * 
    * [[FBRoute POST:@"/wda/touchAndHold"] respondWithTarget:self action:@selector(handleTouchAndHoldCoordinate:)]
    */
-  tapHold (x: number, y: number, duration: number) {
+  tapHold(x: number, y: number, duration: number) {
     return this.http.fetch('post', '/wda/touchAndHold', { x, y, duration })
   }
 
@@ -89,48 +89,48 @@ class Session {
    * 
    * [[FBRoute POST:@"/wda/dragfromtoforduration"] respondWithTarget:self action:@selector(handleDragCoordinate:)]
    */
-  swipe (fromX: number, fromY: number, toX: number, toY: number, duration: number = 0) {
+  swipe(fromX: number, fromY: number, toX: number, toY: number, duration: number = 0) {
     return this.http.fetch('post', '/wda/dragfromtoforduration', { fromX, fromY, toX, toY, duration })
   }
 
-  async swipeLeft () {
+  async swipeLeft() {
     const { width, height } = await this.getWindowSize()
-    return this.swipe(width/2 + 150, height/2, width/2 - 150, height/2)
+    return this.swipe(width / 2 + 150, height / 2, width / 2 - 150, height / 2)
   }
 
-  async swipeRight () {
+  async swipeRight() {
     const { width, height } = await this.getWindowSize()
-    return this.swipe(width/2 - 150, height/2, width/2 + 150, height/2)
+    return this.swipe(width / 2 - 150, height / 2, width / 2 + 150, height / 2)
   }
 
-  async swipeUp () {
+  async swipeUp() {
     const { width, height } = await this.getWindowSize()
-    return this.swipe(width/2, height/2 + 150, width/2, height/2 - 150)
+    return this.swipe(width / 2, height / 2 + 150, width / 2, height / 2 - 150)
   }
 
-  async swipeDown () {
+  async swipeDown() {
     const { width, height } = await this.getWindowSize()
-    return this.swipe(width/2, height/2 - 150, width/2, height/2 + 150)
+    return this.swipe(width / 2, height / 2 - 150, width / 2, height / 2 + 150)
   }
 
   /**
    * @param orientation  LANDSCAPE | PORTRAIT | UIA_DEVICE_ORIENTATION_LANDSCAPERIGHT |
                     UIA_DEVICE_ORIENTATION_PORTRAIT_UPSIDEDOWN
    */
-  async orientation (orientation?: string) {
+  async orientation(orientation?: string) {
     const { value } = !orientation ? await this.http.fetch('get', 'orientation') : await this.http.fetch('post', 'orientation', { orientation })
     return value
   }
 
-  alert (): Alert {
+  alert(): Alert {
     return new Alert(this)
   }
 
-  close () {
+  close() {
     return this.http.fetch('delete', '/')
   }
-  
-  selector (selectorObj: SelectorObj) {
+
+  selector(selectorObj: SelectorObj) {
     const httpclient = this.http.newClient('')
     return new Selector(httpclient, this, selectorObj)
   }
@@ -138,7 +138,7 @@ class Session {
   /**
    * get window size
    */
-  private async getWindowSize (): Promise<{ width: number, height: number }> {
+  private async getWindowSize(): Promise<{ width: number, height: number }> {
     const { value } = await this.http.fetch('get', '/window/size')
     return value
   }

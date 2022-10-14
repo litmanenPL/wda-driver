@@ -2,21 +2,21 @@ class Rect {
   x: number
   y: number
   width: number
-  height:  number
+  height: number
 
-  constructor (x: number, y: number, width: number, height:  number) {
+  constructor(x: number, y: number, width: number, height: number) {
     this.x = x
     this.y = y
     this.width = width
     this.height = height
   }
 
-  getCenter () {
-    const [x, y] = [ this.x+this.width/2, this.y+this.height/2 ]
+  getCenter() {
+    const [x, y] = [this.x + this.width / 2, this.y + this.height / 2]
     return [x, y]
   }
 
-  getOrigin () {
+  getOrigin() {
     const { x, y } = this
     return [x, y]
   }

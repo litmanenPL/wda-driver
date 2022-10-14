@@ -56,7 +56,7 @@ class Selector {
   //     "partial link text", "link text"
   //     "name", "id", "accessibility id"
   //     "class name", "class chain", "xpath", "predicate string"
-  
+
   // predicate string support many keys
   //     UID,
   //     accessibilityContainer,
@@ -80,7 +80,7 @@ class Selector {
   //     wdUID,
   //     wdValue,
   //     wdVisible
-  constructor (httpclient: HTTPClient, session: Session, selectorObj: SelectorObj) {
+  constructor(httpclient: HTTPClient, session: Session, selectorObj: SelectorObj) {
     this.http = httpclient
     this.session = session
 
@@ -124,11 +124,11 @@ class Selector {
    * @param v
    * @return string with properly formated quotes, or non changed text
    */
-  private addEscapeCharacterForQuotePrimeCharacter (text: string = '') {
-    return text.replace("'", "\\'").replace('"','\\"')
+  private addEscapeCharacterForQuotePrimeCharacter(text: string = '') {
+    return text.replace("'", "\\'").replace('"', '\\"')
   }
 
-  private fixXcuiType (s: string) {
+  private fixXcuiType(s: string) {
     if (!s) return ''
     const reElement = ELEMENTS.join('|')
 
@@ -142,9 +142,9 @@ class Selector {
         {"ELEMENT": "597B1A1E-70B9-4CBE-ACAD-40943B0A6034"}
     ]
    */
-  private async wdasearch (using: string, value: string): Promise<any[]> {
+  private async wdasearch(using: string, value: string): Promise<any[]> {
     const elementIds: any[] = []
-    let { value: data } = await this.http.fetch('post', '/elements', { using , value })
+    let { value: data } = await this.http.fetch('post', '/elements', { using, value })
     data = typeof data === 'string' ? [] : data
 
     data.forEach((d: any) => {
@@ -154,7 +154,7 @@ class Selector {
   }
 
   // just return if aleady exists predicate
-  private genClassChain () {
+  private genClassChain() {
     if (this.predicate) {
       return '/XCUIElementTypeAny[`' + this.predicate + '`]'
     }
@@ -198,7 +198,7 @@ class Selector {
     return chain
   }
 
-  findElementIds () {
+  findElementIds() {
     if (this.id)
       return this.wdasearch('id', this.id)
     if (this.predicate)
@@ -213,7 +213,7 @@ class Selector {
   }
 
   // return Element (list): all the elements
-  async findElements () {
+  async findElements() {
     const es: any[] = []
     const ids = await this.findElementIds()
     ids.forEach(id => {
@@ -223,7 +223,7 @@ class Selector {
     return es
   }
 
-  async count () {
+  async count() {
     const ids = await this.findElementIds()
     return ids.length
   }
@@ -233,17 +233,17 @@ class Selector {
    * @param timeout timeout for query element, unit seconds Default 10s
    * @return Element: UI Element
    */
-  async get (timeout: number = this.timeout): Promise<Element> {
+  async get(timeout: number = this.timeout): Promise<Element> {
     const startTime = new Date().getTime()
     while (true) {
       const elems = await this.findElements()
-      if (elems.length > 0){
+      if (elems.length > 0) {
         return elems[0]
-      }     
+      }
       if (startTime + (timeout * 1000) < new Date().getTime()) {
         break
       }
-     await sleep(10)
+      await sleep(10)
     }
     // check alert again
     const exists = await this.session.alert().exists()
@@ -255,7 +255,7 @@ class Selector {
   }
 
   // Set element wait timeout
-  setTimeout (s: number) {
+  setTimeout(s: number) {
     this.timeout = s
     return this
   }
@@ -265,8 +265,8 @@ class Selector {
     selectorObj['parentClassChains'] = this.parentClassChains.concat([chain])
     return new Selector(this.http, this.session, selectorObj)
   }
-    
-  async exists () {
+
+  async exists() {
     const ids = await this.findElementIds()
     return ids.length > this.index
   }
@@ -276,7 +276,7 @@ class Selector {
    * @param timeout timeout for wait
    * @returns bool: if successfully clicked
    */
-  async clickExists (timeout: number = 0) {
+  async clickExists(timeout: number = 0) {
     let e: Element
     try {
       e = await this.get(timeout)
@@ -291,11 +291,11 @@ class Selector {
    * alias of get
    * @param timeout timeout seconds
    */
-  async wait (timeout: number = this.timeout) {
+  async wait(timeout: number = this.timeout) {
     return await this.get(timeout)
   }
 
-  async waitGone (timeout: number = this.timeout) {
+  async waitGone(timeout: number = this.timeout) {
     const startTime = new Date().getTime()
     while (startTime + (timeout * 1000) > new Date().getTime()) {
       if (!await this.exists()) {
