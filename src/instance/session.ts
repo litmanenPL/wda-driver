@@ -134,6 +134,15 @@ class Session {
     return new Alert(this)
   }
 
+  async keys(value: string, frequency?: number) {
+    let payload: object = { 'value': value }
+    if (frequency) {
+      payload = { ...payload, frequency }
+    }
+
+    return await this.http.fetch('post', '/wda/keys', payload);
+  }
+
   close() {
     return this.http.fetch('delete', '/')
   }

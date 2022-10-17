@@ -790,6 +790,15 @@ class Session {
     alert() {
         return new Alert(this);
     }
+    keys(value, frequency) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let payload = { 'value': value };
+            if (frequency) {
+                payload = Object.assign(Object.assign({}, payload), { frequency });
+            }
+            return yield this.http.fetch('post', '/wda/keys', payload);
+        });
+    }
     close() {
         return this.http.fetch('delete', '/');
     }
