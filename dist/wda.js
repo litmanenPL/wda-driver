@@ -711,6 +711,12 @@ class Session {
             return yield this.http.fetch('post', 'url', { 'url': url });
         });
     }
+    lock() {
+        return this.http.fetch('post', '/wda/lock');
+    }
+    unlock() {
+        return this.http.fetch('post', '/wda/unlock');
+    }
     /**
      * @param duration deactivate time, seconds
      */
@@ -819,6 +825,18 @@ class Client {
         return __awaiter(this, void 0, void 0, function* () {
             // Press home button
             return yield this.http.fetch('post', '/wda/homescreen');
+        });
+    }
+    lock() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Lock device
+            return yield this.http.fetch('post', '/wda/lock');
+        });
+    }
+    unlock() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Lock device
+            return yield this.http.fetch('post', '/wda/unlock');
         });
     }
     healthcheck() {

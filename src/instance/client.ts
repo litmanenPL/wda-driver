@@ -24,6 +24,16 @@ class Client {
     return await this.http.fetch('post', '/wda/homescreen')
   }
 
+  async lock() {
+    // Lock device
+    return await this.http.fetch('post', '/wda/lock')
+  }
+
+  async unlock() {
+    // Lock device
+    return await this.http.fetch('post', '/wda/unlock')
+  }
+
   async healthcheck() {
     // Hit healthcheck
     return await this.http.fetch('get', '/wda/healthcheck')

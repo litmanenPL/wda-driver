@@ -52,6 +52,14 @@ class Session {
     return await this.http.fetch('post', 'url', { 'url': url })
   }
 
+  lock() {
+    return this.http.fetch('post', '/wda/lock')
+  }
+
+  unlock() {
+    return this.http.fetch('post', '/wda/unlock')
+  }
+
   /**
    * @param duration deactivate time, seconds
    */
